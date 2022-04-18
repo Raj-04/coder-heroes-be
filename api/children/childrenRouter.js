@@ -37,6 +37,7 @@ router.post('/', authRequired, checkChildObject, async function (
   res,
   next
 ) {
+  //Make profile
   const { profile_id } = req.body;
   try {
     await Children.findByChildId(profile_id).then(async (user) => {

@@ -30,16 +30,26 @@ const isChildAlreadyEnrolled = async (req, res, next) => {
 };
 
 const checkChildObject = async (req, res, next) => {
-  const { profile_id } = req.body;
-  if (!profile_id) next({ status: 400, message: 'profile_id is required' });
-  if (typeof profile_id !== 'number')
-    next({ status: 400, message: 'profile_id must be of type number' });
-  const profile = await Children.findByChildId(profile_id);
-  if (!profile)
-    next({
-      status: 400,
-      message: `profile with id ${profile_id} does not exist`,
-    });
+  const { name, username, age, avatarUrl } = req.body;
+  if (!name) next({ status: 400, message: 'name is required' });
+  if (!username) next({ status: 400, message: 'username is required' });
+  if (!age) next({ status: 400, message: 'age is required' });
+
+  if (typeof name !== 'string') {
+    next({ status: 400, message: 'name must be a string' });
+  }
+
+  if (typeof username !== 'string') {
+    next({ status: 400, message: 'username must be a string' });
+  }
+
+  if (typeof age !== 'number') {
+    next({ status: 400, message: 'age must be a number' });
+  }
+
+  if (typeof avatarUrl !== 'string' || avatarUrl.length > 255) {
+    req.body.avatarUrl = null;
+  }
 
   next();
 };
