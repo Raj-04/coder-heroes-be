@@ -1,9 +1,11 @@
 const express = require('express');
 const authRequired = require('../middleware/authRequired');
+const {
+  roleAuthenticationParent,
+} = require('../middleware/roleAuthentication');
 const { checkChildObject } = require('../children/childrenMiddleware');
-const { create } = require('../profile/profileModel');
 const Parents = require('./parentModel');
-const { addChild } = require('../children/childrenModel');
+const Children = require('../children/childrenModel');
 const router = express.Router();
 
 router.get('/:profile_id/children', authRequired, function (req, res) {
@@ -40,23 +42,18 @@ router.get('/:profile_id/schedules', authRequired, function (req, res) {
 router.post(
   '/:parent_id/children',
   authRequired,
+  roleAuthenticationParent,
   checkChildObject,
-  async (req, res) => {
-    //Make profile with the name and role_id: 5
+  function (req, res) {
     const { parent_id } = req.params;
-    try {
-      const { profile_id } = await create({ name: req.body.name, role_id: 5 });
-      const child = await addChild({
-        profile_id,
-        username: req.body.username,
-        age: req.body.age,
-        parent_id,
+    Children.addChild({ ...req.body, parent_id })
+      .then(([child]) => {
+        res.status(201).json({ message: 'Child successfully added!', child });
+      })
+      .catch((err) => {
+        console.log("add child didn't work");
+        res.status(500).json({ error: err.message });
       });
-
-      res.status(201).json(child);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
   }
 );
 

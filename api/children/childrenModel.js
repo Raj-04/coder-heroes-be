@@ -12,7 +12,24 @@ const findByChildId = async (id) => {
 };
 
 const addChild = async (child) => {
-  return await db('children').insert(child).returning('*');
+  let [profile_id] = await db('profiles')
+    .insert({
+      email: null,
+      name: child.name,
+      okta_id: null,
+      role_id: 5,
+      avatarUrl: child.avatarUrl,
+    })
+    .returning('profile_id');
+  console.log(profile_id);
+  return db('children')
+    .insert({
+      profile_id,
+      username: child.username,
+      age: child.age,
+      parent_id: child.parent_id,
+    })
+    .returning('*');
 };
 
 const getEnrolledCourses = async (id) => {

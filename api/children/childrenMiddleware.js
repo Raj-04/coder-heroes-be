@@ -31,23 +31,24 @@ const isChildAlreadyEnrolled = async (req, res, next) => {
 
 const checkChildObject = async (req, res, next) => {
   const { name, username, age, avatarUrl } = req.body;
-  if (!name) next({ status: 400, message: 'name is required' });
-  if (!username) next({ status: 400, message: 'username is required' });
-  if (!age) next({ status: 400, message: 'age is required' });
+  if (!name) res.status(400).json({ status: 400, message: 'name is required' });
+  if (!username)
+    res.status(400).json({ status: 400, message: 'username is required' });
+  if (!age) res.status(400).json({ status: 400, message: 'age is required' });
 
   if (typeof name !== 'string') {
-    next({ status: 400, message: 'name must be a string' });
+    res.status(400).json({ status: 400, message: 'name must be a string' });
   }
 
   if (typeof username !== 'string') {
-    next({ status: 400, message: 'username must be a string' });
+    res.status(400).json({ status: 400, message: 'username must be a string' });
   }
 
   if (typeof age !== 'number') {
-    next({ status: 400, message: 'age must be a number' });
+    res.status(400).json({ status: 400, message: 'age must be a number' });
   }
 
-  if (typeof avatarUrl !== 'string' || avatarUrl.length > 255) {
+  if (!avatarUrl || typeof avatarUrl !== 'string' || avatarUrl.length > 255) {
     req.body.avatarUrl = null;
   }
 
